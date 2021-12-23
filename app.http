@@ -1,0 +1,36 @@
+GET http://localhost:1026/todos/?status=TO%20DO/
+
+### 
+
+GET http://localhost:1026/todos/2/ 
+
+###
+
+GET http://localhost:1026/agenda/?date=2021-02-22
+
+###
+
+POST http://localhost:1026/todos/
+Content-Type: application/json
+
+{
+  "id": 6,
+  "todo": "Finalize event theme",
+  "priority": "LOW",
+  "status": "TO DO",
+  "category": "HOME",
+  "dueDate": "2021-02-22"
+}
+
+### 
+
+PUT http://localhost:1026/todos/2/ 
+Content-Type: application/json
+
+{
+  "dueDate": "2021-01-12"
+}
+
+###
+
+DELETE http://localhost:1026/todos/6/
