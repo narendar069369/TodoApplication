@@ -86,39 +86,73 @@ app.put("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   let updateColumn = "";
   const requestBody = request.body;
+
+  const doFurtherSteps = async (updateColumn) => {
+    const previousTodoQuery = `SELECT * FROM todo WHERE id = '${todoId}';`;
+    const previousTodo = await db.get(previousTodoQuery);
+
+    const {
+      status = previousTodo.status,
+      priority = previousTodo.priority,
+      todo = previousTodo.todo,
+      category = previousTodo.category,
+      dueDate = previousTodo.dueDate,
+    } = request.body;
+
+    const updateTodoQuery = `UPDATE todo SET status = '${status}', priority = '${priority}', todo = '${todo}', category = '${category}', due_date = '${dueDate}';`;
+
+    await db.run(updateTodoQuery);
+    response.send(`${updateColumn} Updated`);
+  };
   switch (true) {
     case requestBody.status !== undefined:
-      updateColumn = "Status";
+      if (
+        requestBody.status === "TO DO" ||
+        requestBody.status === "IN PROGRESS" ||
+        requestBody.status === "DONE"
+      ) {
+        updateColumn = "Status";
+        doFurtherSteps(updateColumn);
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Status");
+      }
       break;
     case requestBody.priority !== undefined:
-      updateColumn = "Priority";
+      if (
+        requestBody.priority === "HIGH" ||
+        requestBody.priority === "MEDIUM" ||
+        requestBody.priority === "LOW"
+      ) {
+        updateColumn = "Priority";
+        doFurtherSteps(updateColumn);
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Priority");
+      }
       break;
     case requestBody.todo !== undefined:
       updateColumn = "Todo";
+      doFurtherSteps(updateColumn);
       break;
     case requestBody.category !== undefined:
-      updateColumn = "Category";
+      if (
+        requestBody.category === "WORK" ||
+        requestBody.category === "HOME" ||
+        requestBody.category === "LEARNING"
+      ) {
+        updateColumn = "Category";
+        doFurtherSteps(updateColumn);
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Category");
+      }
       break;
     case requestBody.dueDate !== undefined:
       updateColumn = "Due Date";
+      doFurtherSteps(updateColumn);
       break;
   }
-
-  const previousTodoQuery = `SELECT * FROM todo WHERE id = '${todoId}';`;
-  const previousTodo = await db.get(previousTodoQuery);
-
-  const {
-    status = previousTodo.status,
-    priority = previousTodo.priority,
-    todo = previousTodo.todo,
-    category = previousTodo.category,
-    dueDate = previousTodo.dueDate,
-  } = request.body;
-
-  const updateTodoQuery = `UPDATE todo SET status = '${status}', priority = '${priority}', todo = '${todo}', category = '${category}', due_date = '${dueDate}';`;
-
-  await db.run(updateTodoQuery);
-  response.send(`${updateColumn} Updated`);
 });
 
 // API 6
@@ -129,3 +163,5 @@ app.delete("/todos/:todoId/", async (request, response) => {
   await db.run(deleteTodoQuery);
   response.send("Todo Deleted");
 });
+
+module.exports = app;
