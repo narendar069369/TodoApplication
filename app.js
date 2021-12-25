@@ -99,7 +99,7 @@ app.put("/todos/:todoId/", async (request, response) => {
       dueDate = previousTodo.dueDate,
     } = request.body;
 
-    const updateTodoQuery = `UPDATE todo SET status = '${status}', priority = '${priority}', todo = '${todo}', category = '${category}', due_date = '${dueDate}';`;
+    const updateTodoQuery = `UPDATE todo SET status = '${status}', priority = '${priority}', todo = '${todo}', category = '${category}', due_date = '${dueDate}' WHERE id = '${todoId}';`;
 
     await db.run(updateTodoQuery);
     response.send(`${updateColumn} Updated`);
@@ -165,3 +165,4 @@ app.delete("/todos/:todoId/", async (request, response) => {
 });
 
 module.exports = app;
+
